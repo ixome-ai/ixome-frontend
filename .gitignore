@@ -76,4 +76,4 @@ items.json
 # Frontend-specific
 backups/
 website-frontend/frontend/public/blog-image/
-website-frontend/frontend/assets/img/
+website-frontend/frontend/assets/img/<large_file>
