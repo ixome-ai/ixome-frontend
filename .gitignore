@@ -1,3 +1,4 @@
+# /home/vincent/ixome/ixome-frontend/.gitignore
 # Python caches and temps
 __pycache__/
 *.pyc
@@ -39,20 +40,25 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Add more if needed (e.g., sensitive .env files)
+# Sensitive files
 .env
 secrets.py
+.env.local
+.env.production
+*.key
+*.pem
+credentials.json
 
 # Nuxt.js
 .nuxt/
 dist/
+build/
 
 # Strapi
-dist/
-build/
 .cache/
 .strapi/
 exports/
+public/uploads/
 
 # Flask/Agents
 *.db
@@ -67,14 +73,7 @@ items.json
 *.pkl
 *.h5
 
-# Additional env/secrets
-.env.local
-.env.production
-*.key
-*.pem
-credentials.json
-# Ixome frontend-specific
-security/
-node_modules/
-__pycache__/
-*.pyc
+# Frontend-specific
+backups/
+website-frontend/frontend/public/blog-image/
+website-frontend/frontend/assets/img/
