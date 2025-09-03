@@ -72,7 +72,7 @@ onMounted(() => {
       messages.value.push({
         id: Date.now(),
         sender: data.sender || 'Bot',
-        text: data.text || data.message || 'No response text',
+        text: typeof data === 'string' ? data : data.text || data.message || data || 'No response text',
         timestamp: new Date().getTime(),
       });
     });
@@ -97,24 +97,16 @@ onUnmounted(() => {
 });
 
 const sendMessage = () => {
-  if (!isClient.value || !newMessage.value.trim() || !socket.value) return;
-  try {
-    console.log('Sending message:', newMessage.value);
-    socket.value.emit('message', {
-      user_id: currentUserId.value,
-      message: newMessage.value,
-    });
-    messages.value.push({
-      id: Date.now(),
-      sender: currentUserId.value,
-      text: newMessage.value,
-      timestamp: new Date().getTime(),
-    });
-    newMessage.value = '';
-  } catch (error) {
-    errorMessage.value = `Couldn’t send message: ${error.message}`;
-    console.error('Message sending error:', error);
-  }
+  if (!newMessage.value.trim() || !socket.value) return;
+  console.log('Sending message:', newMessage.value);
+  socket.value.emit('message', { message: newMessage.value, user_id: currentUserId.value });
+  messages.value.push({
+    id: Date.now(),
+    sender: currentUserId.value,
+    text: newMessage.value,
+    timestamp: new Date().getTime(),
+  });
+  newMessage.value = '';
 };
 
 const formatTimestamp = (timestamp) => {

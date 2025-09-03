@@ -31,36 +31,36 @@ import { ref } from 'vue';
 import { NuxtLink } from '#components';
 import { useRouter } from 'vue-router';
 
-const username = ref('');
-const password = ref('');
+const username = ref('testuser21');
+const password = ref('Test212!');
 const error = ref('');
 const router = useRouter();
 
 const handleLogin = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:5003/login', {
+    const response = await fetch('http://127.0.0.1:1337/api/auth/local', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        username: username.value,
+        identifier: username.value,
         password: password.value
       })
     });
     const data = await response.json();
-    if (data.status === 'success') {
-      localStorage.setItem('token', data.jwt); // Store JWT as 'token'
-      localStorage.setItem('user_id', username.value); // Store username as user_id
+    if (response.ok && data.jwt) {
+      localStorage.setItem('token', data.jwt);
+      localStorage.setItem('user_id', data.user.username);
       console.log('Login successful, JWT stored:', data.jwt);
       router.push('/support');
       error.value = '';
     } else {
-      error.value = data.message || 'Login failed. Try again.';
-      console.error('Login failed:', data.message);
+      error.value = data.error?.message || 'Login failed. Try again.';
+      console.error('Login failed:', data.error?.message);
     }
   } catch (err) {
-    error.value = 'Login failed. Try again.';
+    error.value = 'Login failed: Unable to connect to server.';
     console.error('Login error:', err);
   }
 };

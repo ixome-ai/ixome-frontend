@@ -1,6 +1,10 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-08-21',
-  modules: ['@nuxtjs/strapi', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
+  modules: ['@nuxtjs/strapi', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode', 'nuxt-socket-io'],
+  socketio: {
+    name: 'ixome',
+    server: 'http://127.0.0.1:5003'
+  },
   strapi: {
     url: 'http://127.0.0.1:1337',
     prefix: '/api',
