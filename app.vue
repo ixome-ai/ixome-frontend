@@ -7,7 +7,6 @@
 </template>
 
 <script setup>
-import '~/assets/css/tailwind.css';
 useHead({
   title: 'IXome.ai - Smart Home Automation',
   meta: [

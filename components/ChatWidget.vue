@@ -10,11 +10,10 @@
     >
       <span>Chat with Us</span>
     </NuxtLink>
-
     <!-- Chat Widget (visible on /support) -->
     <div v-if="isSupportPage" class="chat-widget">
-      <div v-if="!token" class="login-form">
-        <input v-model="username" type="text" placeholder="Username" required>
+      <div v-if="!authStore.token" class="login-form">
+        <input v-model="username" type="text" placeholder="Username or Email" required>
         <input v-model="password" type="password" placeholder="Password" required>
         <button @click="login">Login</button>
       </div>
@@ -31,70 +30,54 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { NuxtLink } from '#components';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { io } from 'socket.io-client';
-
+import { useAuthStore } from '~/stores/auth';
 const route = useRoute();
 const showChatButton = computed(() => route.path !== '/support');
 const isSupportPage = computed(() => route.path === '/support');
-
 const username = ref('');
 const password = ref('');
 const query = ref('');
 const response = ref('');
-const token = ref('');
 const messages = ref([]);
-const socket = ref(null);
-
-onMounted(() => {
-  token.value = localStorage.getItem('token') || '';
-  if (isSupportPage.value && token.value) {
-    const userId = localStorage.getItem('user_id') || 'unknown';
-    socket.value = io('http://127.0.0.1:5003', {
-      auth: { token: token.value, user_id: userId },
-    });
-
-    socket.value.on('connect', () => {
-      console.log('Connected to Socket.IO server');
-      response.value = 'Connected to support chat!';
-    });
-
-    socket.value.on('message', (msg) => {
-      messages.value.push({ text: typeof msg === 'string' ? msg : msg.text || msg.message || 'No response', sent: false });
-    });
-
-    socket.value.on('connect_error', (err) => {
-      console.error('Socket connection error:', err);
-      response.value = 'Connection error: ' + err.message;
-    });
+const authStore = useAuthStore();
+onMounted(async () => {
+  if (isSupportPage.value && authStore.token) {
+    console.log('Using stored JWT for chat');
+    if (!authStore.user) {
+      try {
+        const res = await fetch('http://localhost:1337/api/users/me', {
+          headers: { 'Authorization': `Bearer ${authStore.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          authStore.setUser(data);
+          console.log('User loaded from /me:', data);
+        } else {
+          console.error('Failed to load user from /me');
+        }
+      } catch (e) {
+        console.error('Error loading user:', e);
+      }
+    }
   }
 });
-
-onUnmounted(() => {
-  if (socket.value) {
-    socket.value.disconnect();
-  }
-});
-
 const login = async () => {
   try {
-    const res = await fetch('http://127.0.0.1:1337/api/auth/local', {
+    const res = await fetch('http://localhost:1337/api/auth/local', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier: username.value, password: password.value }),
     });
     const data = await res.json();
     if (res.ok && data.jwt) {
-      token.value = data.jwt;
-      localStorage.setItem('token', data.jwt);
-      localStorage.setItem('user_id', data.user.username);
+      authStore.setAuth(data.jwt, data.user);
       console.log('Login successful, JWT stored:', data.jwt);
       response.value = 'Login successful! You can now use the chat.';
-      // Reload to connect socket
+      // Reload to apply auth
       location.reload();
     } else {
       response.value = data.error?.message || 'Login failed';
@@ -103,19 +86,41 @@ const login = async () => {
     response.value = 'Error logging in: ' + e.message;
   }
 };
-
-const sendQuery = () => {
-  if (!query.value || !socket.value) {
-    response.value = 'Please enter a message or ensure you are connected.';
+const sendQuery = async () => {
+  if (!query.value) {
+    response.value = 'Please enter a message.';
     return;
   }
-  const userId = localStorage.getItem('user_id') || 'unknown';
-  socket.value.emit('message', { message: query.value, user_id: userId });
+  const token = authStore.token;
+  if (!token) {
+    response.value = 'No JWT token available. Please login.';
+    return;
+  }
   messages.value.push({ text: query.value, sent: true });
+  try {
+    const res = await fetch('http://localhost:5003/agent/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        input: query.value,
+        thread_id: 'test1' // Placeholder
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      messages.value.push({ text: data.response, sent: false });
+    } else {
+      messages.value.push({ text: 'Error: ' + (data.error || 'Unknown error'), sent: false });
+    }
+  } catch (e) {
+    messages.value.push({ text: 'Error sending message: ' + e.message, sent: false });
+  }
   query.value = '';
 };
 </script>
-
 <style scoped>
 .floating-chat-button {
   position: fixed;

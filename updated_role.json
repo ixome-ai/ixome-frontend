@@ -1,0 +1,66 @@
+{
+  "data": {
+    "permissions": {
+      "api::subscriber-id": {
+        "controllers": {
+          "subscriber-id": {
+            "find": {
+              "enabled": true
+            },
+            "findOne": {
+              "enabled": true
+            }
+          }
+        }
+      },
+      "api::hero": {
+        "controllers": {
+          "hero": {
+            "find": {
+              "enabled": true
+            }
+          }
+        }
+      },
+      "api::footer": {
+        "controllers": {
+          "footer": {
+            "find": {
+              "enabled": true
+            }
+          }
+        }
+      },
+      "api::article": {
+        "controllers": {
+          "article": {
+            "find": {
+              "enabled": true
+            },
+            "findOne": {
+              "enabled": true
+            }
+          }
+        }
+      },
+      "api::category": {
+        "controllers": {
+          "category": {
+            "find": {
+              "enabled": true
+            },
+            "findOne": {
+              "enabled": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "error": {
+    "status": 401,
+    "name": "UnauthorizedError",
+    "message": "Missing or invalid credentials",
+    "details": {}
+  }
+}

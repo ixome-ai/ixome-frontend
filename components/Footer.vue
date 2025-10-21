@@ -10,42 +10,42 @@
                 <img v-else src="~/assets/img/logo.png" alt="ixome.ai default logo" />
               </NuxtLink>
             </div>
-            <p>{{ footer?.shortDesc || 'Empowering smart homes with AI-driven solutions for Lutron and Control4.' }}</p>
+            <p>{{ footer.shortDesc || 'Empowering smart homes with AI-driven solutions for Lutron and Control4.' }}</p>
           </div>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6">
           <div class="single-footer-widget pl-5">
-            <h3>{{ footer?.title || 'Company' }}</h3>
+            <h3>{{ footer.title || 'Company' }}</h3>
             <ul class="list">
-              <li v-for="company in footer?.companyLists || fallbackCompanyLists" :key="company.id || company.title">
-                <NuxtLink v-if="isInternalLink(company.link)" :to="mapInternalLink(company.link)" class="footer-link">{{ company.title }}</NuxtLink>
-                <a v-else :href="company.link" target="_blank" class="footer-link">{{ company.title }}</a>
+              <li v-for="company in footer.companyLists?.data || fallbackCompanyLists" :key="company.id || company.title">
+                <NuxtLink v-if="isInternalLink(company.attributes?.link)" :to="mapInternalLink(company.attributes?.link)" class="footer-link">{{ company.attributes?.title }}</NuxtLink>
+                <a v-else :href="company.attributes?.link" target="_blank" class="footer-link">{{ company.attributes?.title }}</a>
               </li>
             </ul>
           </div>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6">
           <div class="single-footer-widget">
-            <h3>{{ footer?.titleTwo || 'Support' }}</h3>
+            <h3>{{ footer.titleTwo || 'Support' }}</h3>
             <ul class="list">
-              <li v-for="support in footer?.supportLists || fallbackSupportLists" :key="support.id || support.title">
-                <NuxtLink v-if="isInternalLink(support.link)" :to="mapInternalLink(support.link)" class="footer-link">{{ support.title }}</NuxtLink>
-                <a v-else :href="support.link" target="_blank" class="footer-link">{{ support.title }}</a>
+              <li v-for="support in footer.supportLists?.data || fallbackSupportLists" :key="support.id || support.title">
+                <NuxtLink v-if="isInternalLink(support.attributes?.link)" :to="mapInternalLink(support.attributes?.link)" class="footer-link">{{ support.attributes?.title }}</NuxtLink>
+                <a v-else :href="support.attributes?.link" target="_blank" class="footer-link">{{ support.attributes?.title }}</a>
               </li>
             </ul>
           </div>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6">
           <div class="single-footer-widget">
-            <h3>{{ footer?.titleThree || 'Contact' }}</h3>
+            <h3>{{ footer.titleThree || 'Contact' }}</h3>
             <ul class="footer-contact-info">
-              <li><i class="fas fa-map-marker-alt"></i>{{ footer?.address || '123 Smart Home Ave, Tech City, USA' }}</li>
-              <li><i class="fas fa-envelope"></i>Email: <a :href="`mailto:${footer?.email || 'support@ixome.ai'}`">{{ footer?.email || 'support@ixome.ai' }}</a></li>
-              <li><i class="fas fa-phone"></i>Phone: <a :href="`tel:${footer?.phone || '+1-800-IXOME-AI'}`">{{ footer?.phone || '+1-800-IXOME-AI' }}</a></li>
+              <li><i class="fas fa-map-marker-alt"></i>{{ footer.address || '123 Smart Home Ave, Tech City, USA' }}</li>
+              <li><i class="fas fa-envelope"></i>Email: <a :href="`mailto:${footer.email || 'support@ixome.ai'}`">{{ footer.email || 'support@ixome.ai' }}</a></li>
+              <li><i class="fas fa-phone"></i>Phone: <a :href="`tel:${footer.phone || '+1-800-IXOME-AI'}`">{{ footer.phone || '+1-800-IXOME-AI' }}</a></li>
             </ul>
             <ul class="social-links">
-              <li v-for="social in footer?.socialLink || fallbackSocialLinks" :key="social.id || social.icon">
-                <a :href="social.link" target="_blank" :aria-label="social.title || 'Social Media'"><i :class="social.icon || 'fab fa-facebook'"></i></a>
+              <li v-for="social in footer.socialLink?.data || fallbackSocialLinks" :key="social.id || social.icon">
+                <a :href="social.attributes?.link" target="_blank" :aria-label="social.attributes?.title || 'Social Media'"><i :class="social.attributes?.icon || 'fab fa-facebook'"></i></a>
               </li>
             </ul>
           </div>
@@ -81,20 +81,20 @@ const error = ref(false);
 const strapiUrl = useRuntimeConfig().public.strapiUrl;
 
 const fallbackCompanyLists = [
-  { title: 'IXome', link: '/' },
-  { title: 'About', link: '/about' },
-  { title: 'Services', link: '/services' }
+  { attributes: { title: 'IXome', link: '/' } },
+  { attributes: { title: 'About', link: '/about' } },
+  { attributes: { title: 'Services', link: '/services' } }
 ];
 const fallbackSupportLists = [
-  { title: 'FAQ', link: '/faq' },
-  { title: 'Support', link: '/support' },
-  { title: 'Contact', link: '/contact' }
+  { attributes: { title: 'FAQ', link: '/faq' } },
+  { attributes: { title: 'Support', link: '/support' } },
+  { attributes: { title: 'Contact', link: '/contact' } }
 ];
 const fallbackSocialLinks = [
-  { link: 'https://facebook.com/ixomeai', icon: 'fab fa-facebook', title: 'Facebook' },
-  { link: 'https://twitter.com/ixomeai', icon: 'fab fa-twitter', title: 'Twitter' },
-  { link: 'https://linkedin.com/company/ixomeai', icon: 'fab fa-linkedin-in', title: 'LinkedIn' },
-  { link: 'https://instagram.com/ixomeai', icon: 'fab fa-instagram', title: 'Instagram' }
+  { attributes: { link: 'https://facebook.com/ixomeai', icon: 'fab fa-facebook', title: 'Facebook' } },
+  { attributes: { title: 'Twitter', link: 'https://twitter.com/ixomeai', icon: 'fab fa-twitter' } },
+  { attributes: { title: 'LinkedIn', link: 'https://linkedin.com/company/ixomeai', icon: 'fab fa-linkedin-in' } },
+  { attributes: { title: 'Instagram', link: 'https://instagram.com/ixomeai', icon: 'fab fa-instagram' } }
 ];
 
 const scrollToTop = () => {
@@ -116,12 +116,14 @@ onMounted(async () => {
   });
 
   try {
-    const footerResponse = await fetch(`${strapiUrl}/api/footers?populate=*`);
-    if (!footerResponse.ok) throw new Error('Fetch failed');
+    const footerResponse = await fetch(`${strapiUrl}/api/footer?populate=*`);
+    if (!footerResponse.ok) {
+      throw new Error(`HTTP error! Status: ${footerResponse.status}`);
+    }
     const footerData = await footerResponse.json();
-    footer.value = footerData.data[0]?.attributes || {};
+    footer.value = footerData.data.attributes || {};
 
-    const relativeUrl = footer.value?.logo?.data?.attributes?.url || null;
+    const relativeUrl = footer.value.logo?.data?.attributes?.url || null;
     footerLogoUrl.value = relativeUrl ? `${strapiUrl}${relativeUrl}` : null;
   } catch (err) {
     console.error('Error fetching footer data:', err);
