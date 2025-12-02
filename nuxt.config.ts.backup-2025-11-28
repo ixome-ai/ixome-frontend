@@ -1,0 +1,7 @@
+export default defineNuxtConfig({
+  compatibilityDate: "2025-11-28",
+  devtools: { enabled: false },
+  modules: [
+    '@nuxt/ui', // This includes Tailwind v4 + icons + everything
+  ]
+})

@@ -1,0 +1,82 @@
+<template>
+  <div class="min-h-screen bg-gray-50">
+    <header class="navbar">
+      <nav>
+        <NuxtLink to="/">Home</NuxtLink>
+        <NuxtLink to="/about">About</NuxtLink>
+        <NuxtLink to="/offerings">Offerings</NuxtLink>
+        <NuxtLink to="/blog">Blog</NuxtLink>
+        <NuxtLink to="/contact">Contact</NuxtLink>
+        <NuxtLink to="/pricing">Pricing</NuxtLink>
+      </nav>
+    </header>
+    <main class="max-w-6xl mx-auto px-6 py-16">
+      <h1 class="text-5xl font-bold text-center mb-4">Simple, Transparent Pricing</h1>
+      <p class="text-xl text-center text-gray-600 mb-12">Unlock the full power of your smart home.</p>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h2 class="text-2xl font-bold mb-4">Free</h2>
+          <p class="text-4xl font-bold mb-6">$0<span class="text-lg font-normal text-gray-500">/forever</span></p>
+          <ul class="space-y-4 mb-8">
+            <li>✓ Basic text troubleshooting</li>
+            <li>✓ 10 queries per day</li>
+            <li>✓ Community support</li>
+          </ul>
+          <button class="w-full bg-gray-300 text-gray-700 py-4 rounded-lg font-semibold" disabled>Current Plan</button>
+        </div>
+        <div class="bg-gradient-to-br from-[#2E7D32] to-[#4CAF50] text-white rounded-xl shadow-2xl p-8 transform scale-105">
+          <div class="bg-white/20 rounded-lg px-4 py-1 inline-block mb-4">Most Popular</div>
+          <h2 class="text-3xl font-bold mb-4">Premium</h2>
+          <p class="text-5xl font-bold mb-2">$14.99<span class="text-xl font-normal">/mo</span></p>
+          <ul class="space-y-4 mb-8">
+            <li>✓ Unlimited queries</li>
+            <li>✓ Priority voice troubleshooter</li>
+            <li>✓ Future scene builder</li>
+            <li>✓ 24/7 priority fixes</li>
+          </ul>
+          <button @click="subscribe('premium_monthly')" class="w-full bg-white text-[#2E7D32] py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">Subscribe Monthly</button>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8 border-2 border-[#2E7D32]">
+          <h2 class="text-2xl font-bold mb-4">Lifetime</h2>
+          <p class="text-4xl font-bold mb-6">$299<span class="text-lg font-normal text-gray-500"> one-time</span></p>
+          <ul class="space-y-4 mb-8">
+            <li>✓ Everything in Premium</li>
+            <li>✓ No recurring billing</li>
+            <li>✓ Forever updates</li>
+          </ul>
+          <button @click="subscribe('lifetime')" class="w-full bg-[#2E7D32] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#1B5E20] transition">Buy Lifetime</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { loadStripe } from '@stripe/stripe-js'
+
+const stripePromise = loadStripe(process.env.STRIPE_PUBLISHABLE_KEY)  // From .env
+
+const subscribe = async (plan) => {
+  const priceId = plan === 'premium_monthly' ? 'price_monthly_14_99' : 'price_lifetime_299'
+  const mode = plan === 'lifetime' ? 'payment' : 'subscription'
+  try {
+    const response = await fetch('http://localhost:5000/api/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ priceId, mode })
+    })
+    const { id } = await response.json()
+    const stripe = await stripePromise
+    await stripe.redirectToCheckout({ sessionId: id })
+  } catch (error) {
+    console.error('Checkout error:', error)
+  }
+}
+</script>
+
+<style scoped>
+.navbar { background: linear-gradient(135deg, #2E7D32, #4CAF50); padding: 1rem; }
+.navbar nav { display: flex; justify-content: space-around; }
+.navbar a { color: white; text-decoration: none; }
+@media (max-width: 768px) { .navbar nav { flex-direction: column; } .grid { grid-template-columns: 1fr; } }
+</style>
